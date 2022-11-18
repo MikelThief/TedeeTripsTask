@@ -16,4 +16,9 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TedeeTrips.Application\TedeeTrips.Application.csproj" />
+      <ProjectReference Include="..\TedeeTrips.Domain\TedeeTrips.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

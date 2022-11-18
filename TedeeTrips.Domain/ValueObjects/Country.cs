@@ -4,6 +4,8 @@ namespace TedeeTrips.Domain.ValueObjects;
 
 public class Country : EnumValueObject<Country, int>
 {
+    public static readonly Country Mexico = new Country((int)CountryEnum.Mexico, "Mexico");
+    
     public static readonly Country Poland = new Country((int)CountryEnum.Poland, "Poland");
     
     public static readonly Country Quatar = new Country((int)CountryEnum.Quatar, "Quatar");
@@ -16,6 +18,7 @@ public class Country : EnumValueObject<Country, int>
 
     private enum CountryEnum
     {
+        Mexico = 0,
         Poland = 1,
         Quatar = 2,
         Germany = 3,

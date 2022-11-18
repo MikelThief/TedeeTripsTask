@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using MassTransit;
+﻿using MassTransit;
 using TedeeTrips.Domain.Entities;
 using TedeeTrips.Domain.ValueObjects;
 
