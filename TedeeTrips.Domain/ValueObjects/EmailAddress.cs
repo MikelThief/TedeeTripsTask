@@ -8,11 +8,11 @@ public class EmailAddress : SimpleValueObject<string>
     {
     }
     
-    private static bool ContainsAtSign(string value) => value.Contains("@");
+    private static bool ContainsAtSign(string value) => value.Contains('@');
 
     public static Result<EmailAddress, ErrorArray> Create(string value) =>
         Maybe.From(value)
-             .ToResult(Errors.Email.InvalidValue())
-             .Ensure(x => ContainsAtSign(x), _ => Errors.Email.InvalidValue())
-             .Finally(x => new EmailAddress(x.Value));
+             .ToResult(Errors.Email.InvalidValue().ToErrorArray())
+             .Ensure(ContainsAtSign, _ => Errors.Email.InvalidValue())
+             .Map(x => new EmailAddress(x));
 }

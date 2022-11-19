@@ -5,12 +5,11 @@ using TedeeTrips.Domain.ValueObjects;
 
 namespace TedeeTrips.Domain.Entities;
 
-public class Trip
+public class Trip: Entity<Guid>
 {
-    [Obsolete("Should not be used by anyone but EF Core")]
-    protected Trip(Guid id, TripName name, Country country, string description, DateTimeOffset startDate, uint seatsCount)
+    [Obsolete("Should not be used by anyone but EF Core and Trip class itself.")]
+    public Trip(TripName name, Country country, string description, DateTimeOffset startDate, uint seatsCount)
     {
-        Id = id;
         Name = name;
         Country = country;
         Description = description;
@@ -18,8 +17,6 @@ public class Trip
         SeatsCount = seatsCount;
     }
 
-    public Guid Id { get; set; }
-    
     public TripName Name { get; set; }
     
     public Country Country { get; set; }
@@ -32,7 +29,7 @@ public class Trip
     
     public static Trip Reconsitute(Guid id, TripName name, Country country, string description, DateTimeOffset startDate, uint seatsCount)
     {
-        return new Trip(id, name, country, description, startDate, seatsCount);
+        return new Trip(name, country, description, startDate, seatsCount) { Id = id };
     }
 
     public static Result<Trip, ErrorArray> Create(CreateTrip command, ICollection<TripName> takenNames)
@@ -40,8 +37,8 @@ public class Trip
         return Country
                .FromId(command.CountryId)
                .ToResult(Errors.Country.InvalidValue().ToErrorArray())
-               .Bind(country => TripName.Create(command.Name).Map(tripName => (tripName, country)))
+               .Bind(country => TripName.Create(command.Name).Map(tripName => new { TripName = tripName, Country = country }))
                .Ensure(_ => takenNames.All(n => !string.Equals((string)n, command.Name, StringComparison.Ordinal)), Errors.Trip.NameIsNotUnique(command.Name))
-               .Map(arguments => Reconsitute(NewId.Next().ToSequentialGuid(), arguments.tripName, arguments.country, command.Description, command.StartDate, command.SeatsCount));
+               .Map(arg => Reconsitute(NewId.Next().ToSequentialGuid(), arg.TripName, arg.Country, command.Description, command.StartDate, command.SeatsCount));
     }
 }

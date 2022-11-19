@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TedeeTrips.Application.Services;
-using TedeeTrips.Domain.Aggregates;
 using TedeeTrips.Domain.Entities;
 using TedeeTrips.Domain.ValueObjects;
 
@@ -14,25 +14,42 @@ public class RegistrationsDbContext : DbContext, IRegistrationsContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Trip>()
-                    .Property(t => t.Country)
-                    .HasConversion(v => v.Id, v => Country.FromId(v).GetValueOrThrow("Database state does not conform to domain invariants."));
+        modelBuilder.Entity<RegisteredEmailAddress>(e =>
+        {
+            var converter = new ValueConverter<EmailAddress, string>(
+                from => from.Value,
+                to => EmailAddress.Create(to).Value);
+            
+            e.Property(r => r.EmailAddress)
+             .HasConversion(converter);
 
-        modelBuilder.Entity<Trip>()
-                    .Property(t => t.Name)
-                    .HasConversion(v => v.Value, v => TripName.Create(v).Value);
+            e
+                .HasMany(r => r.Enrollments)
+                .WithOne(r => r.RegisteredEmailAddress)
+                .OnDelete(DeleteBehavior.Cascade)
+                .Metadata.PrincipalToDependent!.SetPropertyAccessMode(PropertyAccessMode.Field);
+        });
         
-        modelBuilder.Entity<Registration>()
-                    .Property(t => t.EmailAddress)
-                    .HasConversion(v => v.Value, v => EmailAddress.Create(v).Value);
+        modelBuilder.Entity<Trip>(e =>
+        {
+            e.Property(t => t.Country)
+             .HasConversion(
+                 v => v.Id,
+                 v => Country.FromId(v).GetValueOrThrow("Database state does not conform to domain invariants."));
+            
+            e.Property(t => t.Name)
+                .HasConversion(v => v.Value, v => TripName.Create(v).Value);
+        });
 
-        modelBuilder.Entity<Registration>()
-                    .HasOne(t => t.Trip);
+        modelBuilder.Entity<Enrollment>(e =>
+        {
+            e.HasOne(p => p.RegisteredEmailAddress).WithMany(p => p.Enrollments);
+            e.HasOne(p => p.Trip).WithMany();
+        });
         
         base.OnModelCreating(modelBuilder);
     }
 
     public DbSet<Trip> Trips { get; set; }
-    
-    public DbSet<Registration> Registrations { get; set; }
+    public DbSet<RegisteredEmailAddress> RegisteredEmailAddresses { get; set; }
 }

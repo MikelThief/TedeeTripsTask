@@ -45,7 +45,7 @@ public class TripCommandsHandler : IRequestHandler<CreateTrip, Result<Trip, Erro
     {
         var maybeTrip = await _registrationsContext.Trips.FindAsync(new object?[] {request.Id}, cancellationToken);
 
-        return await Maybe.From(maybeTrip)
+        return await Maybe.From(maybeTrip!)
                    .ToResult(Errors.Trip.NotFound().ToErrorArray())
                    .Map(async trip =>
                    {
@@ -53,9 +53,9 @@ public class TripCommandsHandler : IRequestHandler<CreateTrip, Result<Trip, Erro
                                                                   .ToListAsync(cancellationToken);
                        tripNames.RemoveAt(
                            tripNames.FindIndex(x => string.Equals((string) x, trip!.Name, StringComparison.Ordinal)));
-                       return (trip, tripNames);
+                       return new { Trip = trip, TripNames = tripNames };
                    })
-                   .Check(arguments => arguments.trip!.UpdateFrom(request, arguments.tripNames))
+                   .Check(arg => arg.Trip.UpdateFrom(request, arg.TripNames))
                    .Tap(_ => _registrationsContext.SaveChangesAsync(cancellationToken));
     }
 }
