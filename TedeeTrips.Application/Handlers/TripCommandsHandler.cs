@@ -32,12 +32,12 @@ public class TripCommandsHandler : IRequestHandler<CreateTrip, Result<Trip, Erro
     public async Task<Unit> Handle(DeleteTrip request, CancellationToken cancellationToken)
     {
         var maybeTrip = await _registrationsContext.Trips.FindAsync(new object?[] {request.Id}, cancellationToken);
-        
-        if (maybeTrip is not null)
+        await Maybe.From(maybeTrip).Execute(async t =>
         {
-            _registrationsContext.Trips.Remove(maybeTrip);
+            _registrationsContext.Trips.Remove(t!);
             await _registrationsContext.SaveChangesAsync(cancellationToken);
-        }
+        });
+
         return Unit.Value;
     }
 
@@ -45,14 +45,17 @@ public class TripCommandsHandler : IRequestHandler<CreateTrip, Result<Trip, Erro
     {
         var maybeTrip = await _registrationsContext.Trips.FindAsync(new object?[] {request.Id}, cancellationToken);
 
-        if (maybeTrip is null)
-        {
-            return UnitResult.Failure(Errors.Trip.NotFound(request.Id).ToErrorArray());
-        }
-        
-        var tripNames = await _registrationsContext.Trips.Select(t => t.Name).ToListAsync(cancellationToken);
-        tripNames.RemoveAt(tripNames.FindIndex(x => string.Equals((string)x, maybeTrip.Name, StringComparison.Ordinal)));
-        
-        return maybeTrip.UpdateFrom(request, tripNames);
+        return await Maybe.From(maybeTrip)
+                   .ToResult(Errors.Trip.NotFound().ToErrorArray())
+                   .Map(async trip =>
+                   {
+                       var tripNames = await _registrationsContext.Trips.Select(t => t.Name)
+                                                                  .ToListAsync(cancellationToken);
+                       tripNames.RemoveAt(
+                           tripNames.FindIndex(x => string.Equals((string) x, trip!.Name, StringComparison.Ordinal)));
+                       return (trip, tripNames);
+                   })
+                   .Check(arguments => arguments.trip!.UpdateFrom(request, arguments.tripNames))
+                   .Tap(_ => _registrationsContext.SaveChangesAsync(cancellationToken));
     }
 }

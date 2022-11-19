@@ -18,7 +18,7 @@ public class TripsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Envelope<Presentation.Trip>>> PostAsync(CreateTrip command)
+    public async Task<ActionResult<Envelope<Presentation.Trip>>> CreateTripAsync(CreateTrip command)
     {
         var res = await _relay.Send(command);
 
