@@ -8,9 +8,16 @@
 
     <ItemGroup>
       <PackageReference Include="CSharpFunctionalExtensions" Version="2.36.1" />
+      <PackageReference Include="HybridModelBinding" Version="0.18.0" />
       <PackageReference Include="MediatR.Contracts" Version="1.0.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
       <PackageReference Include="NewId" Version="3.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Mvc.Core">
+        <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.11\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

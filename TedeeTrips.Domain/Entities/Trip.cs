@@ -35,11 +35,12 @@ public class Trip
         return new Trip(id, name, country, description, startDate, seatsCount);
     }
 
-    public static Result<Trip, ErrorArray> Create(CreateTrip command)
+    public static Result<Trip, ErrorArray> Create(CreateTrip command, ICollection<string> takenNames)
     {
         return Country
                .FromId(command.CountryId)
                .ToResult(Errors.Country.InvalidValue().ToErrorArray())
+               .Ensure(_ => takenNames.All(n => !string.Equals(n, command.Name, StringComparison.Ordinal)), Errors.Trip.NameIsNotUnique(command.Name))
                .Map(country => Reconsitute(NewId.Next().ToSequentialGuid(), command.Name, country, command.Description, command.StartDate, command.SeatsCount));
     }
 }

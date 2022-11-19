@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using TedeeTrips.Application.Query;
 using TedeeTrips.Core.Presentation;
 using TedeeTrips.Domain.Commands;
-using TedeeTrips.Domain.Entities;
 
 namespace TedeeTrips.Core.Controllers;
 
@@ -11,17 +10,17 @@ namespace TedeeTrips.Core.Controllers;
 [Route("/api/trips")]
 public class TripsController : ControllerBase
 {
-    private readonly IMediator _commandRelay;
+    private readonly IMediator _relay;
 
-    public TripsController(IMediator commandRelay)
+    public TripsController(IMediator relay)
     {
-        _commandRelay = commandRelay;
+        _relay = relay;
     }
 
     [HttpPost]
     public async Task<ActionResult<Envelope<Presentation.Trip>>> PostAsync(CreateTrip command)
     {
-        var res = await _commandRelay.Send(command);
+        var res = await _relay.Send(command);
 
         if (res.IsFailure)
         {
@@ -33,9 +32,9 @@ public class TripsController : ControllerBase
     }
     
     [HttpGet("{id:guid}", Name = "GetTrip")]
-    public async Task<ActionResult<Envelope<Presentation.Trip>>> GetSingleTripAsync([FromRoute] Guid id)
+    public async Task<ActionResult<Envelope<Presentation.Trip>>> GetTripAsync([FromRoute] Guid id)
     {
-        var res = await _commandRelay.Send(new GetTrip(id));
+        var res = await _relay.Send(new GetTrip(id));
 
         if (res.TryGetValue(out var trip))
         {
@@ -52,15 +51,45 @@ public class TripsController : ControllerBase
 
         if (!string.IsNullOrWhiteSpace(country))
         {
-            res = await _commandRelay.Send(new GetTripsByCountry(country));
+            res = await _relay.Send(new GetTripsByCountry(country));
         }
         else
         {
-            res = await _commandRelay.Send(new GetTrips());
+            res = await _relay.Send(new GetTrips());
         }
         
-        var returnables = res.Select(t => Presentation.DescriptionlessTrip.From(t)).ToList();
+        var returnables = res.Select(Presentation.DescriptionlessTrip.From).ToList();
         
-        return Ok(returnables);
+        return Ok(Envelope.Ok(returnables));
+    }
+    
+    [HttpDelete("{id:guid}", Name = "DeleteTrip")]
+    public async Task<ActionResult<Envelope>> DeleteTripAsync([FromRoute] Guid id)
+    {
+        await _relay.Send(new DeleteTrip(id));
+        return Ok(Envelope.Ok());
+    }
+    
+    [HttpPatch("{id:guid}", Name = "ModifyTrip")]
+    public async Task<ActionResult<Envelope<Presentation.Trip>>> ModifyTripAsync([FromRoute] Guid id, [FromBody] ModifyTripRequest request)
+    {
+        var command = new ModifyTrip()
+        {
+            Id = id,
+            Name = request.Name,
+            Description = request.Description,
+            CountryId = request.CountryId,
+            StartDate = request.StartDate,
+            SeatsCount = request.SeatsCount
+        };
+        
+        var res = await _relay.Send(command);
+
+        if (res.IsFailure)
+        {
+            return BadRequest(Envelope.Error(res.Error));
+        }
+        
+        return Ok(Envelope.Ok());
     }
 }

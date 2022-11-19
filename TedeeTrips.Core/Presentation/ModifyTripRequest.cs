@@ -1,13 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using MediatR;
-using TedeeTrips.Domain.ValueObjects;
+﻿namespace TedeeTrips.Core.Presentation;
 
-namespace TedeeTrips.Domain.Commands;
-
-public class ModifyTrip :IRequest<UnitResult<ErrorArray>>
+public class ModifyTripRequest
 {
-    public Guid Id { get; init; }
-    
     public string Name { get; init; }
     
     public int CountryId { get; init; }
