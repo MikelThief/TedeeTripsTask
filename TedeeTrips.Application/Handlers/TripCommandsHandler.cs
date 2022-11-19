@@ -51,7 +51,7 @@ public class TripCommandsHandler : IRequestHandler<CreateTrip, Result<Trip, Erro
         }
         
         var tripNames = await _registrationsContext.Trips.Select(t => t.Name).ToListAsync(cancellationToken);
-        tripNames.RemoveAt(tripNames.FindIndex(x => x.Equals(maybeTrip.Name, StringComparison.Ordinal)));
+        tripNames.RemoveAt(tripNames.FindIndex(x => string.Equals((string)x, maybeTrip.Name, StringComparison.Ordinal)));
         
         return maybeTrip.UpdateFrom(request, tripNames);
     }

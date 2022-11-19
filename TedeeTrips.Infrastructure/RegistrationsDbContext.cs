@@ -17,6 +17,10 @@ public class RegistrationsDbContext : DbContext, IRegistrationsContext
         modelBuilder.Entity<Trip>()
                     .Property(t => t.Country)
                     .HasConversion(v => v.Id, v => Country.FromId(v).GetValueOrThrow("Database state does not conform to domain invariants."));
+
+        modelBuilder.Entity<Trip>()
+                    .Property(t => t.Name)
+                    .HasConversion(v => v.Value, v => TripName.Create(v).Value);
         
         modelBuilder.Entity<Registration>()
                     .Property(t => t.EmailAddress)

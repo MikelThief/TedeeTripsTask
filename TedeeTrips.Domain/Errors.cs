@@ -1,4 +1,5 @@
-﻿using TedeeTrips.Domain.ValueObjects;
+﻿using CSharpFunctionalExtensions;
+using TedeeTrips.Domain.ValueObjects;
 
 namespace TedeeTrips.Domain;
 
@@ -9,6 +10,8 @@ public static class Errors
         public static Error NotFound(Guid? id = null) => new Error("Trip.Value.NotFound", $"Trip with id '{id}' was not found. Create it first.");
         
         public static Error NameIsNotUnique(string name) => new Error("Trip.Name.NotUnique", $"Trip with name '{name}' already exists. Choose another name.");
+
+        public static Error NameHasToBeSingleLine() => new Error("Trip.Name.NotASingleLine", $"Trip's name cannot contain new line characters.");
     }
     
     public static class Email
