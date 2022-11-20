@@ -29,7 +29,7 @@ public class Trip: Entity<Guid>
     public static Result<Trip, ErrorArray> Create(CreateTrip command, ICollection<TripName> takenNames)
     {
         return Country
-               .FromId(command.CountryId)
+               .FromName(command.Country)
                .ToResult(Errors.Country.InvalidValue().ToErrorArray())
                .Bind(country => TripName.Create(command.Name).Map(tripName => new { TripName = tripName, Country = country }))
                .Ensure(_ => takenNames.All(n => !string.Equals((string)n, command.Name, StringComparison.Ordinal)), Errors.Trip.NameIsNotUnique(command.Name))

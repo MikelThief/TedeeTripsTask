@@ -10,7 +10,7 @@ public class CreateTrip : IRequest<Result<Trip, ErrorArray>>
 {
     public string Name { get; init; }
     
-    public int CountryId { get; init; }
+    public string Country { get; init; }
     
     public string Description { get; init; }
     
