@@ -15,6 +15,6 @@ The decision making is appropriately splitted between entities and valueobjects.
 
 Processing within domain model strongly relies on functional programming features available in C#. There's also strong use of the type system which allows compiler to work with doubled-effort ensuring correctness of the program in design-time/compile-time. Railway-oriented programming also makes the code much easier to read and understand, because if statements are almost non-existing.
 
-# Word on tests
+## Word on tests
 There are few tests, which cover most important business requirements. They are designed in a way that can let programmers unfamiliar with the code know what the service is expected to do and how it performs in common scenarios. Thus tests act like documentation showing, for example, the lifetime of the entity.
-Some unit tests are provided to show how convienient pure domain model testing is. Tests related to entities were omitted (becuase they are not much different in its look), but the invariant are also covered in integration tests.
+Some unit tests are provided to show how convienient pure domain model testing is. Tests related to entities were omitted (because they are not much different in its look), but the invariant are also covered in integration tests.
