@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TedeeTrips.Application.Services;
@@ -34,7 +33,7 @@ public class RegistrationsCommandsHandler : IRequestHandler<Register, UnitResult
 
                   await maybeRegisteredEmailAddress.ExecuteNoValue(async () =>
                   {
-                      maybeRegisteredEmailAddress = new RegisteredEmailAddress {EmailAddress = email};
+                      maybeRegisteredEmailAddress = new RegisteredEmailAddress(email);
                       await _registrationsContext.RegisteredEmailAddresses.AddAsync(
                           maybeRegisteredEmailAddress.GetValueOrThrow(), cancellationToken);
                   });

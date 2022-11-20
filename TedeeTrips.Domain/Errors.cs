@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using TedeeTrips.Domain.ValueObjects;
+﻿using TedeeTrips.Domain.ValueObjects;
 
 namespace TedeeTrips.Domain;
 

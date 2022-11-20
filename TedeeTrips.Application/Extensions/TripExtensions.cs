@@ -12,15 +12,10 @@ public static class TripExtensions
         Country
             .FromId(command.CountryId)
             .ToResult(Errors.Country.InvalidValue().ToErrorArray())
-            .Ensure(_ => tripNames.All(n => !string.Equals((string)n, command.Name, StringComparison.Ordinal)), Errors.Trip.NameIsNotUnique(command.Name))
-            .Bind(country => TripName.Create(command.Name).Map(tripName => (tripName, country)))
-            .Tap(arguments =>
-            {
-                trip.Country = arguments.country;
-                trip.Description = command.Description;
-                trip.Name = arguments.tripName;
-                trip.SeatsCount = command.SeatsCount;
-                trip.StartDate = command.StartDate;
-            })
+            .Ensure(_ => tripNames.All(n => !string.Equals((string) n, command.Name, StringComparison.Ordinal)),
+                    Errors.Trip.NameIsNotUnique(command.Name))
+            .Bind(country => TripName.Create(command.Name).Map(tripName => new { Tripname = tripName, Country = country }))
+            .Tap(arguments => trip.EditInfo(arguments.Tripname, arguments.Country, command.Description,
+                                            command.StartDate, command.SeatsCount))
             .Map(_ => trip);
 }
