@@ -6,6 +6,7 @@ using TedeeTrips.Domain.Commands;
 namespace TedeeTrips.Core.Controllers;
 
 [Route("api/registrations")]
+[Produces("application/json")]
 [ApiController]
 public class RegistrationsController : ControllerBase
 {
@@ -17,6 +18,8 @@ public class RegistrationsController : ControllerBase
     }
     
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Envelope>> RegisterAsync(Register command)
     {
         var res = await _relay.Send(command);
@@ -30,6 +33,8 @@ public class RegistrationsController : ControllerBase
     }
     
     [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Envelope>> UnregisterAsync(Unregister command)
     {
         var res = await _relay.Send(command);

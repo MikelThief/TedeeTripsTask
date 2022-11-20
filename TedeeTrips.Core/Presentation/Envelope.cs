@@ -1,4 +1,5 @@
-﻿using TedeeTrips.Domain.ValueObjects;
+﻿using System.Text.Json.Serialization;
+using TedeeTrips.Domain.ValueObjects;
 
 namespace TedeeTrips.Core.Presentation;
 
@@ -10,7 +11,8 @@ public class Envelope<T>
     public string? ErrorMessage { get; }
     public DateTimeOffset CreatedAt { get; }
 
-    protected internal Envelope(T? result, string? errorCode, string? errorMessage)
+    [JsonConstructor]
+    public Envelope(T? result, string? errorCode, string? errorMessage)
     {
         Result = result;
         ErrorCode = errorCode;
@@ -21,7 +23,7 @@ public class Envelope<T>
 
 public sealed class Envelope : Envelope<string>
 {
-    private Envelope(string errorCode, string errorMessage)
+    public Envelope(string errorCode, string errorMessage)
         : base(null, errorCode, errorMessage)
     {
     }

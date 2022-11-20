@@ -49,7 +49,8 @@ public class TripCommandsHandler : IRequestHandler<CreateTrip, Result<Trip, Erro
                    .ToResult(Errors.Trip.NotFound().ToErrorArray())
                    .Map(async trip =>
                    {
-                       var tripNames = await _registrationsContext.Trips.Select(t => t.Name)
+                       var tripNames = await _registrationsContext.Trips
+                                                                  .Select(t => t.Name)
                                                                   .ToListAsync(cancellationToken);
                        tripNames.RemoveAt(
                            tripNames.FindIndex(x => string.Equals((string) x, trip!.Name, StringComparison.Ordinal)));

@@ -8,6 +8,7 @@ namespace TedeeTrips.Core.Controllers;
 
 [ApiController]
 [Route("/api/trips")]
+[Produces("application/json")]
 public class TripsController : ControllerBase
 {
     private readonly IMediator _relay;
@@ -18,6 +19,8 @@ public class TripsController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Envelope<Presentation.Trip>>> CreateTripAsync(CreateTrip command)
     {
         var res = await _relay.Send(command);
@@ -28,10 +31,12 @@ public class TripsController : ControllerBase
         }
         
         // we could return just an ID, but for the sake of the evaluation, we return the whole object
-        return CreatedAtRoute("GetTrip", new { id = res.Value.Id }, Presentation.Trip.From(res.Value));
+        return CreatedAtRoute("GetTrip", new { id = res.Value.Id }, Envelope.Ok(Trip.From(res.Value)));
     }
     
     [HttpGet("{id:guid}", Name = "GetTrip")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Envelope<Presentation.Trip>>> GetTripAsync([FromRoute] Guid id)
     {
         var res = await _relay.Send(new GetTrip(id));
@@ -45,6 +50,7 @@ public class TripsController : ControllerBase
     }
     
     [HttpGet("", Name = "GetTripsByCountry")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<Envelope<Presentation.DescriptionlessTrip>>> GetTripsByCountryAsync([FromQuery] string? country)
     {
         ICollection<Domain.Entities.Trip> res;
@@ -64,6 +70,7 @@ public class TripsController : ControllerBase
     }
     
     [HttpDelete("{id:guid}", Name = "DeleteTrip")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<Envelope>> DeleteTripAsync([FromRoute] Guid id)
     {
         await _relay.Send(new DeleteTrip(id));
@@ -71,6 +78,8 @@ public class TripsController : ControllerBase
     }
     
     [HttpPatch("{id:guid}", Name = "ModifyTrip")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Envelope<Presentation.Trip>>> ModifyTripAsync([FromRoute] Guid id, [FromBody] ModifyTripRequest request)
     {
         var command = new ModifyTrip()

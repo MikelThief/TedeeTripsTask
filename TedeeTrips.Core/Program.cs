@@ -11,8 +11,7 @@ builder.Services
        .AddInfrastructureLayer();
 
 builder.Services
-       .AddControllers()
-       .AddHybridModelBinder();
+       .AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,3 +31,9 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+#pragma warning disable CA1050 // Declare types in namespaces
+public partial class Program
+{
+}
+#pragma warning restore CA1050 // Declare types in namespaces

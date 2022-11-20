@@ -12,6 +12,9 @@ public static class TripExtensions
         Country
             .FromId(command.CountryId)
             .ToResult(Errors.Country.InvalidValue().ToErrorArray())
+            // Alternatively, in real-word complex scenario,
+            // the call to Ensure below could be replaced with a domain service
+            // that receives TripNames and new trip name
             .Ensure(_ => tripNames.All(n => !string.Equals((string) n, command.Name, StringComparison.Ordinal)),
                     Errors.Trip.NameIsNotUnique(command.Name))
             .Bind(country => TripName.Create(command.Name).Map(tripName => new { Tripname = tripName, Country = country }))

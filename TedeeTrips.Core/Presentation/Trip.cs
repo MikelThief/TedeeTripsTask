@@ -1,8 +1,11 @@
-﻿namespace TedeeTrips.Core.Presentation;
+﻿using System.Text.Json.Serialization;
+
+namespace TedeeTrips.Core.Presentation;
 
 public class Trip
 {
-    private Trip(Guid id, string name, string country, string description, DateTimeOffset startDate, uint seatsCount)
+    [JsonConstructor]
+    public Trip(Guid id, string name, string country, string description, DateTimeOffset startDate, uint seatsCount)
     {
         Id = id;
         Name = name;
